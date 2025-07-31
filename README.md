@@ -28,17 +28,16 @@ cd movie-explorer
 
 ## 2. Install dependecies
 npm install
-3. Set your TMDB API Key
+## 3. Set your TMDB API Key
 Create a .env file in the root directory:
-
-## 3.
 VITE_TMDB_API_KEY=your_tmdb_api_key_here
 You can get your API key at https://www.themoviedb.org/settings/api
-4. Run the development server
+
+## 4. Run the development server
 npm run dev
 Open http://localhost:5173 in your browser.
 
-## 4.🔐 Login Credentials
+## 5.🔐 Login Credentials
 
 Mock login is enabled for demonstration purposes:
 Username: admin  
