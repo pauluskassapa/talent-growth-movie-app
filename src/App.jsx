@@ -4,11 +4,15 @@ import { fetchPopularMovies, searchMovies } from "./api/tmdb";
 function App() {
   const [movies, setMovies] = useState([]);
   const [query, setQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [noResults, setNoResults] = useState(false);
 
   useEffect(() => {
     const loadMovies = async () => {
+      setIsLoading(true);
       const movieList = await fetchPopularMovies();
       setMovies(movieList);
+      setIsLoading(false);
     };
 
     loadMovies();
@@ -16,8 +20,12 @@ function App() {
 
   const handleSearch = async () => {
     if (query.trim() === "") return;
-    const results = await searchMovies(query);
-    setMovies(results);
+
+    setIsLoading(true);
+    const searchResult = await searchMovies(query);
+    setMovies(searchResult);
+    setNoResults(searchResult.length === 0);
+    setIsLoading(false);
   };
 
   return (
@@ -38,32 +46,20 @@ function App() {
         </button>
       </div>
 
-      {/* Movie List */}
+      {/* Loading / No Results Info */}
+      {isLoading && <p>Loading movies...</p>}
+      {noResults && <p>No movies found. Try another title.</p>}
+
+      {/* Movie Grid */}
       <div style={{ display: "flex", flexWrap: "wrap" }}>
         {movies.map((movie) => (
-          <div
-            key={movie.id}
-            style={{
-              margin: 10,
-              width: 200,
-              border: "1px solid #ddd",
-              padding: 10,
-              borderRadius: 8,
-            }}
-          >
+          <div key={movie.id} style={{ margin: 10, width: 200 }}>
             <img
               src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
               alt={movie.title}
-              style={{ width: "100%", borderRadius: 5 }}
+              style={{ width: "100%" }}
             />
-            <p style={{ fontWeight: "bold", margin: "10px 0 5px" }}>
-              {movie.title}
-            </p>
-            <p style={{ margin: 0 }}>📅 {movie.release_date}</p>
-            <p style={{ margin: 0 }}>⭐ {movie.vote_average}</p>
-            <p style={{ fontSize: 12, color: "#555" }}>
-              {movie.overview ? movie.overview.substring(0, 100) + "..." : ""}
-            </p>
+            <p>{movie.title}</p>
           </div>
         ))}
       </div>
