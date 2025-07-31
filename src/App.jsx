@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { fetchPopularMovies } from "./api/tmdb";
+import { fetchPopularMovies, searchMovies } from "./api/tmdb";
 
 function App() {
   const [movies, setMovies] = useState([]);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     const loadMovies = async () => {
@@ -13,9 +14,31 @@ function App() {
     loadMovies();
   }, []);
 
+  const handleSearch = async () => {
+    if (query.trim() === "") return;
+    const results = await searchMovies(query);
+    setMovies(results);
+  };
+
   return (
-    <div>
+    <div style={{ padding: 20 }}>
       <h1>Popular Movies</h1>
+
+      {/* Search Bar */}
+      <div style={{ marginBottom: 20 }}>
+        <input
+          type="text"
+          value={query}
+          placeholder="Search movies..."
+          onChange={(e) => setQuery(e.target.value)}
+          style={{ padding: 8, width: 250, marginRight: 10 }}
+        />
+        <button onClick={handleSearch} style={{ padding: "8px 16px" }}>
+          Search
+        </button>
+      </div>
+
+      {/* Movie List */}
       <div style={{ display: "flex", flexWrap: "wrap" }}>
         {movies.map((movie) => (
           <div
