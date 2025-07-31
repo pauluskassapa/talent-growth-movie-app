@@ -43,7 +43,7 @@ const Login = () => {
 
       {/* Tambahan link ke Register */}
       <p style={{ marginTop: "10px" }}>
-        Belum punya akun? <Link to="/register">Daftar di sini</Link>
+        Don't have an account yet? <Link to="/register">Register hereLink>
       </p>
     </div>
   );
