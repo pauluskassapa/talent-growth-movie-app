@@ -1,118 +1,92 @@
 import React, { useEffect, useState } from "react";
 import { fetchPopularMovies, searchMovies } from "../api/tmdb";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import "./Home.css";
 
 const Home = () => {
   const [movies, setMovies] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    const loadMovies = async () => {
-      try {
-        const data = await fetchPopularMovies();
-        setMovies(data || []);
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching popular movies:", err);
-        setError("Failed to load movies.");
-        setMovies([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadMovies();
-  }, []);
-
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!searchTerm.trim()) return;
-
-    setLoading(true);
+  const fetchData = async () => {
     try {
-      const data = await searchMovies(searchTerm);
-      setMovies(data.results || []);
-      setError(null);
+      setLoading(true);
+      setError("");
+      const data = query
+        ? await searchMovies(query, page)
+        : await fetchPopularMovies(page);
+      setMovies(data.results);
+      setTotalPages(data.total_pages);
     } catch (err) {
-      console.error("Search failed:", err);
-      setError("Search failed. Please try again.");
-      setMovies([]);
+      setError("Failed to fetch movies");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDetail = (id) => {
-    navigate(`/movie/${id}`);
+  useEffect(() => {
+    fetchData();
+  }, [query, page]);
+
+  const handleSearchChange = (e) => {
+    setQuery(e.target.value);
+    setPage(1); // reset ke halaman 1 kalau cari
+  };
+
+  const handlePrev = () => {
+    if (page > 1) setPage(page - 1);
+  };
+
+  const handleNext = () => {
+    if (page < totalPages) setPage(page + 1);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <h1 className="text-4xl font-bold text-center text-blue-700 mb-8">
-        🎬 Movie Explorer
-      </h1>
+    <div className="home-container">
+      <h1>🎬 Movie Explorer</h1>
+      <input
+        type="text"
+        placeholder="Search movies..."
+        value={query}
+        onChange={handleSearchChange}
+        className="search-input"
+      />
 
-      {/* Search Bar */}
-      <form
-        onSubmit={handleSearch}
-        className="mb-6 flex justify-center items-center gap-2"
-      >
-        <input
-          type="text"
-          placeholder="Search movies..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="p-3 w-64 sm:w-80 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition"
-        >
-          Search
+      {loading && <p>Loading...</p>}
+      {error && <p className="error">{error}</p>}
+      {!loading && !error && movies.length === 0 && <p>No movies found.</p>}
+
+      <div className="movies-grid">
+        {movies.map((movie) => (
+          <Link to={`/detail/${movie.id}`} key={movie.id} className="movie-card">
+            {movie.poster_path ? (
+              <img
+                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                alt={movie.title}
+              />
+            ) : (
+              <div className="no-image">No Image</div>
+            )}
+            <h3>{movie.title}</h3>
+          </Link>
+        ))}
+      </div>
+
+      {/* Pagination */}
+      <div className="pagination">
+        <button disabled={page === 1} onClick={handlePrev}>
+          ⬅ Prev
         </button>
-      </form>
-
-      {/* Error */}
-      {error && (
-        <div className="text-center text-red-500 font-medium mb-4">{error}</div>
-      )}
-
-      {/* Loading */}
-      {loading ? (
-        <div className="text-center text-gray-500">Loading movies...</div>
-      ) : movies.length === 0 ? (
-        <div className="text-center text-gray-500">No movies found.</div>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-          {movies.map((movie) => (
-            <div
-              key={movie.id}
-              onClick={() => handleDetail(movie.id)}
-              className="bg-white rounded-lg overflow-hidden shadow hover:shadow-lg cursor-pointer transition transform hover:scale-105"
-            >
-              {movie.poster_path ? (
-                <img
-                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                  alt={movie.title}
-                  className="w-full h-80 object-cover"
-                />
-              ) : (
-                <div className="w-full h-80 bg-gray-300 flex items-center justify-center">
-                  <span className="text-gray-500 text-sm">No Image</span>
-                </div>
-              )}
-              <div className="p-2">
-                <p className="text-center font-semibold text-sm">
-                  {movie.title}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+        <span>
+          Page {page} of {totalPages}
+        </span>
+        <button disabled={page === totalPages} onClick={handleNext}>
+          Next ➡
+        </button>
+      </div>
     </div>
   );
 };

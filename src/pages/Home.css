@@ -1,0 +1,82 @@
+.home-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.search-input {
+  padding: 10px;
+  width: 60%;
+  max-width: 400px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.movie-card {
+  text-decoration: none;
+  color: black;
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 10px;
+  transition: transform 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.movie-card:hover {
+  transform: scale(1.05);
+}
+
+.movie-card img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.no-image {
+  width: 100%;
+  height: 240px;
+  background: #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #666;
+}
+
+.error {
+  color: red;
+}
+
+.pagination {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.pagination button {
+  padding: 8px 16px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
