@@ -88,3 +88,54 @@
   background-color: #aaa;
   cursor: not-allowed;
 }
+
+@media (max-width: 768px) {
+  .search-input {
+    width: 90%;
+  }
+
+  .movies-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+  }
+
+  .movie-card img {
+    height: 200px;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* Dark Mode Styles */
+.dark {
+  background-color: #121212;
+  color: white;
+}
+
+.dark .search-input {
+  background-color: #1e1e1e;
+  color: white;
+  border: 1px solid #555;
+}
+
+.dark .movie-card {
+  background-color: #1e1e1e;
+  color: white;
+}
+
+.dark .no-image {
+  background-color: #333;
+  color: #aaa;
+}
+
+.toggle-dark {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  margin-bottom: 10px;
+  font-weight: bold;
+}

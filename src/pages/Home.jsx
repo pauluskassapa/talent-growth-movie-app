@@ -10,6 +10,22 @@ const Home = () => {
   const [error, setError] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [darkMode, setDarkMode] = useState(false);
+
+  // Load dark mode from localStorage
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("darkMode");
+    if (savedTheme) setDarkMode(savedTheme === "true");
+  }, []);
+
+  // Save dark mode preference
+  useEffect(() => {
+    localStorage.setItem("darkMode", darkMode);
+  }, [darkMode]);
+
+  const toggleDarkMode = () => {
+    setDarkMode((prev) => !prev);
+  };
 
   const fetchData = async () => {
     try {
@@ -18,11 +34,14 @@ const Home = () => {
       const data = query
         ? await searchMovies(query, page)
         : await fetchPopularMovies(page);
-      setMovies(data.results);
+
+      setMovies((prevMovies) =>
+        page === 1 ? data.results : [...prevMovies, ...data.results]
+      );
       setTotalPages(data.total_pages);
     } catch (err) {
       setError("⚠️ Failed to fetch movies. Please try again later.");
-      setMovies([]); // Kosongkan daftar movie jika gagal
+      setMovies([]);
     } finally {
       setLoading(false);
     }
@@ -34,20 +53,36 @@ const Home = () => {
 
   const handleSearchChange = (e) => {
     setQuery(e.target.value);
-    setPage(1); // Reset ke halaman pertama saat user mengetik
+    setPage(1); // Reset ke halaman pertama saat user mulai mengetik
   };
 
-  const handlePrev = () => {
-    if (page > 1) setPage(page - 1);
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const fullHeight = document.documentElement.scrollHeight;
 
-  const handleNext = () => {
-    if (page < totalPages) setPage(page + 1);
-  };
+      if (
+        scrollTop + windowHeight >= fullHeight - 100 &&
+        !loading &&
+        page < totalPages
+      ) {
+        setPage((prev) => prev + 1);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [loading, page, totalPages]);
 
   return (
-    <div className="home-container">
+    <div className={`home-container ${darkMode ? "dark" : ""}`}>
+      <button onClick={toggleDarkMode} className="toggle-dark">
+        {darkMode ? "🌞 Light Mode" : "🌙 Dark Mode"}
+      </button>
+
       <h1>🎬 Movie Explorer</h1>
+
       <input
         type="text"
         placeholder="Search movies..."
@@ -56,43 +91,30 @@ const Home = () => {
         className="search-input"
       />
 
-      {loading && <p className="info">⏳ Loading movies...</p>}
       {error && <p className="error">{error}</p>}
       {!loading && !error && movies.length === 0 && (
         <p className="info">🔍 No movies found for "{query}".</p>
       )}
 
       <div className="movies-grid">
-        {!loading &&
-          !error &&
-          movies.map((movie) => (
-            <Link to={`/detail/${movie.id}`} key={movie.id} className="movie-card">
-              {movie.poster_path ? (
-                <img
-                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                  alt={movie.title}
-                />
-              ) : (
-                <div className="no-image">No Image</div>
-              )}
-              <h3>{movie.title}</h3>
-            </Link>
-          ))}
+        {movies.map((movie) => (
+          <Link to={`/detail/${movie.id}`} key={movie.id} className="movie-card">
+            {movie.poster_path ? (
+              <img
+                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                alt={movie.title}
+              />
+            ) : (
+              <div className="no-image">No Image</div>
+            )}
+            <h3>{movie.title}</h3>
+          </Link>
+        ))}
       </div>
 
-      {/* Pagination */}
-      {!loading && !error && movies.length > 0 && (
-        <div className="pagination">
-          <button disabled={page === 1} onClick={handlePrev}>
-            ⬅ Prev
-          </button>
-          <span>
-            Page {page} of {totalPages}
-          </span>
-          <button disabled={page === totalPages} onClick={handleNext}>
-            Next ➡
-          </button>
-        </div>
+      {loading && <p className="loading-info">⏳ Loading more movies...</p>}
+      {!loading && movies.length > 0 && (
+        <p className="loading-info">Page {page} of {totalPages}</p>
       )}
     </div>
   );
