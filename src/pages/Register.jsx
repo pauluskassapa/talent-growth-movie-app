@@ -42,7 +42,7 @@ const Register = () => {
       </form>
 
       <p style={{ marginTop: "10px" }}>
-        Sudah punya akun? <Link to="/login">Login di sini</Link>
+        Already have an account? <Link to="/login">Login here</Link>
       </p>
     </div>
   );
