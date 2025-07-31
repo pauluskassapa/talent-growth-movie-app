@@ -56,10 +56,8 @@ No unit tests or e2e testing yet.
 
 ### 📸 Evidence
 Screenshots
-<img width="1512" height="857" alt="Screenshot 2025-07-31 at 12 45 01" src="https://github.com/user-attachments/assets/0c5753ea-8bae-41f8-bb6e-27f2004418a6" />
-<img width="1512" height="856" alt="Screenshot 2025-07-31 at 12 44 48" src="https://github.com/user-attachments/assets/0845148c-e4f8-40b8-adb0-3a0838b42bc9" />
-<img width="1512" height="856" alt="Screenshot 2025-07-31 at 12 44 36" src="https://github.com/user-attachments/assets/4ad4bf6c-3e49-40a8-b9ed-a0f75bf3b38b" />
-
+<img width="1512" height="865" alt="Screenshot 2025-07-31 at 15 38 25" src="https://github.com/user-attachments/assets/92c455da-7dec-433f-b93a-34009d44a9b6" />
+<img width="1512" height="865" alt="Screenshot 2025-07-31 at 15 38 16" src="https://github.com/user-attachments/assets/021a658d-ac91-4f96-8dc8-50818a09fdf8" />
 
 
 🔗 Live Demo: https://goodmovieapp.netlify.app
