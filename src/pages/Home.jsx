@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchPopularMovies, searchMovies } from "../api/tmdb";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import "./Home.css";
 
 const Home = () => {
@@ -12,13 +13,23 @@ const Home = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [darkMode, setDarkMode] = useState(false);
 
-  // Load dark mode from localStorage
+  const { logout, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  // Cek login
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Load dark mode dari localStorage
   useEffect(() => {
     const savedTheme = localStorage.getItem("darkMode");
     if (savedTheme) setDarkMode(savedTheme === "true");
   }, []);
 
-  // Save dark mode preference
+  // Simpan dark mode ke localStorage
   useEffect(() => {
     localStorage.setItem("darkMode", darkMode);
   }, [darkMode]);
@@ -31,12 +42,13 @@ const Home = () => {
     try {
       setLoading(true);
       setError("");
+
       const data = query
         ? await searchMovies(query, page)
         : await fetchPopularMovies(page);
 
-      setMovies((prevMovies) =>
-        page === 1 ? data.results : [...prevMovies, ...data.results]
+      setMovies((prev) =>
+        page === 1 ? data.results : [...prev, ...data.results]
       );
       setTotalPages(data.total_pages);
     } catch (err) {
@@ -51,11 +63,7 @@ const Home = () => {
     fetchData();
   }, [query, page]);
 
-  const handleSearchChange = (e) => {
-    setQuery(e.target.value);
-    setPage(1); // Reset ke halaman pertama saat user mulai mengetik
-  };
-
+  // Scroll pagination
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
@@ -75,13 +83,28 @@ const Home = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [loading, page, totalPages]);
 
+  const handleSearchChange = (e) => {
+    setQuery(e.target.value);
+    setPage(1);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
     <div className={`home-container ${darkMode ? "dark" : ""}`}>
-      <button onClick={toggleDarkMode} className="toggle-dark">
-        {darkMode ? "🌞 Light Mode" : "🌙 Dark Mode"}
-      </button>
+      <div className="top-bar">
+        <button onClick={toggleDarkMode} className="toggle-dark">
+          {darkMode ? "🌞 Light Mode" : "🌙 Dark Mode"}
+        </button>
+        <button onClick={handleLogout} className="logout-button">
+          🚪 Logout
+        </button>
+      </div>
 
-      <h1>🎬 Movie Explorer</h1>
+      <h1 className="title">🎬 Movie Explorer</h1>
 
       <input
         type="text"

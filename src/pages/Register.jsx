@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import "./Auth.css";
 
 const Register = () => {
   const [username, setUsername] = useState("");
@@ -11,12 +12,11 @@ const Register = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const success = register(username, password);
-    if (success) {
-      alert("Registration successful!");
+    const result = register({ username, password });
+    if (result.success) {
       navigate("/login");
     } else {
-      setError("Username already taken");
+      setError(result.message);
     }
   };
 
@@ -25,10 +25,25 @@ const Register = () => {
       <h2>Register</h2>
       {error && <p className="error">{error}</p>}
       <form onSubmit={handleSubmit}>
-        <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" />
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
+        <input
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Username"
+          required
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          required
+        />
         <button type="submit">Register</button>
       </form>
+
+      <p style={{ marginTop: "10px" }}>
+        Sudah punya akun? <Link to="/login">Login di sini</Link>
+      </p>
     </div>
   );
 };
