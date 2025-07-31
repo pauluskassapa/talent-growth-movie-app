@@ -57,6 +57,14 @@
 
 .error {
   color: red;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.info {
+  color: #444;
+  font-style: italic;
+  margin-top: 10px;
 }
 
 .pagination {

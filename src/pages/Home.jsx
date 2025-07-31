@@ -21,7 +21,8 @@ const Home = () => {
       setMovies(data.results);
       setTotalPages(data.total_pages);
     } catch (err) {
-      setError("Failed to fetch movies");
+      setError("⚠️ Failed to fetch movies. Please try again later.");
+      setMovies([]); // Kosongkan daftar movie jika gagal
     } finally {
       setLoading(false);
     }
@@ -33,7 +34,7 @@ const Home = () => {
 
   const handleSearchChange = (e) => {
     setQuery(e.target.value);
-    setPage(1); // reset ke halaman 1 kalau cari
+    setPage(1); // Reset ke halaman pertama saat user mengetik
   };
 
   const handlePrev = () => {
@@ -55,38 +56,44 @@ const Home = () => {
         className="search-input"
       />
 
-      {loading && <p>Loading...</p>}
+      {loading && <p className="info">⏳ Loading movies...</p>}
       {error && <p className="error">{error}</p>}
-      {!loading && !error && movies.length === 0 && <p>No movies found.</p>}
+      {!loading && !error && movies.length === 0 && (
+        <p className="info">🔍 No movies found for "{query}".</p>
+      )}
 
       <div className="movies-grid">
-        {movies.map((movie) => (
-          <Link to={`/detail/${movie.id}`} key={movie.id} className="movie-card">
-            {movie.poster_path ? (
-              <img
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                alt={movie.title}
-              />
-            ) : (
-              <div className="no-image">No Image</div>
-            )}
-            <h3>{movie.title}</h3>
-          </Link>
-        ))}
+        {!loading &&
+          !error &&
+          movies.map((movie) => (
+            <Link to={`/detail/${movie.id}`} key={movie.id} className="movie-card">
+              {movie.poster_path ? (
+                <img
+                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                  alt={movie.title}
+                />
+              ) : (
+                <div className="no-image">No Image</div>
+              )}
+              <h3>{movie.title}</h3>
+            </Link>
+          ))}
       </div>
 
       {/* Pagination */}
-      <div className="pagination">
-        <button disabled={page === 1} onClick={handlePrev}>
-          ⬅ Prev
-        </button>
-        <span>
-          Page {page} of {totalPages}
-        </span>
-        <button disabled={page === totalPages} onClick={handleNext}>
-          Next ➡
-        </button>
-      </div>
+      {!loading && !error && movies.length > 0 && (
+        <div className="pagination">
+          <button disabled={page === 1} onClick={handlePrev}>
+            ⬅ Prev
+          </button>
+          <span>
+            Page {page} of {totalPages}
+          </span>
+          <button disabled={page === totalPages} onClick={handleNext}>
+            Next ➡
+          </button>
+        </div>
+      )}
     </div>
   );
 };
